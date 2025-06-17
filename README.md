@@ -60,6 +60,17 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+## Environment Variables
+
+Create a `.env.local` file based on `.env.example` and provide your Supabase credentials:
+
+```
+VITE_SUPABASE_URL=<your supabase url>
+VITE_SUPABASE_ANON_KEY=<your anon key>
+```
+
+These variables are loaded by Vite and used in the Supabase client. Do not commit `.env.local`.
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/bf9504db-85e2-4559-952c-97eaa6f4ae59) and click on Share -> Publish.
