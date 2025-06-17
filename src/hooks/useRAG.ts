@@ -1,7 +1,8 @@
 
 import { useState, useCallback } from 'react';
+import { adminDocuments } from '@/data/adminDocuments';
 
-interface DocumentChunk {
+export interface DocumentChunk {
   id: string;
   content: string;
   metadata: {
@@ -11,67 +12,8 @@ interface DocumentChunk {
 }
 
 export const useRAG = () => {
-  const [documents, setDocuments] = useState<DocumentChunk[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [documents] = useState<DocumentChunk[]>(adminDocuments);
 
-  const processFiles = useCallback(async (files: File[]) => {
-    setIsProcessing(true);
-    const newDocuments: DocumentChunk[] = [];
-
-    for (const file of files) {
-      try {
-        let content = '';
-        
-        if (file.type === 'application/pdf') {
-          // For now, we'll simulate PDF processing
-          // In a real implementation, you'd use pdf-parse or similar
-          content = `[PDF Content from ${file.name}] - This would contain the actual extracted text from the PDF file.`;
-        } else if (file.type === 'text/plain' || file.type === 'text/markdown') {
-          content = await file.text();
-        }
-
-        // Simple chunking strategy - split by paragraphs or every 500 characters
-        const chunks = chunkText(content, 500);
-        
-        chunks.forEach((chunk, index) => {
-          newDocuments.push({
-            id: `${file.name}-${index}`,
-            content: chunk,
-            metadata: {
-              fileName: file.name,
-              chunkIndex: index,
-            },
-          });
-        });
-      } catch (error) {
-        console.error(`Error processing file ${file.name}:`, error);
-      }
-    }
-
-    setDocuments(prev => [...prev, ...newDocuments]);
-    setIsProcessing(false);
-  }, []);
-
-  const chunkText = (text: string, maxLength: number): string[] => {
-    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-    const chunks: string[] = [];
-    let currentChunk = '';
-
-    for (const sentence of sentences) {
-      if (currentChunk.length + sentence.length > maxLength && currentChunk.length > 0) {
-        chunks.push(currentChunk.trim());
-        currentChunk = sentence;
-      } else {
-        currentChunk += (currentChunk ? '. ' : '') + sentence;
-      }
-    }
-
-    if (currentChunk.trim()) {
-      chunks.push(currentChunk.trim());
-    }
-
-    return chunks;
-  };
 
   const searchRelevantChunks = useCallback((query: string, limit: number = 3): DocumentChunk[] => {
     // Simple keyword-based search
@@ -97,7 +39,7 @@ export const useRAG = () => {
     const relevantChunks = searchRelevantChunks(query);
     
     if (relevantChunks.length === 0) {
-      return "I don't have any relevant information in my knowledge base to answer your question. Please upload some documents first or ask about something else.";
+      return "I don't have any relevant information in my knowledge base to answer your question.";
     }
 
     // Simulate AI response generation
@@ -105,7 +47,7 @@ export const useRAG = () => {
     
     // This is a simple mock response - in a real implementation, 
     // you'd use an actual LLM API like OpenAI, Anthropic, or local models
-    return `Based on the documents you've uploaded, here's what I found:
+    return `Based on the administrator-provided documents, here's what I found:
 
 ${context.substring(0, 300)}...
 
@@ -116,9 +58,7 @@ Note: This is a demo response. In a production system, this would be generated b
 
   return {
     documents,
-    processFiles,
     generateResponse,
-    isProcessing,
     documentCount: documents.length,
   };
 };

@@ -1,13 +1,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Upload, MessageCircle, FileText } from 'lucide-react';
+import { Send, MessageCircle, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import VoiceRecorder from '@/components/VoiceRecorder';
-import FileUpload from '@/components/FileUpload';
 import ChatMessage, { Message } from '@/components/ChatMessage';
 import TypingIndicator from '@/components/TypingIndicator';
 import { useRAG } from '@/hooks/useRAG';
@@ -17,10 +15,9 @@ const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  const { processFiles, generateResponse, isProcessing, documentCount } = useRAG();
+
+  const { generateResponse, documentCount } = useRAG();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -31,7 +28,7 @@ const Index = () => {
     const welcomeMessage: Message = {
       id: 'welcome',
       type: 'assistant',
-      content: 'Hello! I\'m your voice-enabled RAG chatbot. You can:\n\n• Upload documents to build a knowledge base\n• Ask questions via text or voice\n• Get responses based on your uploaded content\n\nStart by uploading some documents or ask me anything!',
+      content: 'Hello! I\'m your voice-enabled RAG chatbot. Ask questions via text or voice and I\'ll answer using the administrator-provided knowledge base.',
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
@@ -78,19 +75,6 @@ const Index = () => {
     }
   };
 
-  const handleFileUpload = async (files: File[]) => {
-    setUploadedFiles(prev => [...prev, ...files]);
-    await processFiles(files);
-    
-    toast({
-      title: "Files Uploaded",
-      description: `Successfully processed ${files.length} file(s)`,
-    });
-  };
-
-  const handleRemoveFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-  };
 
   const handleVoiceRecording = (audioBlob: Blob) => {
     // In a real implementation, you'd convert speech to text here
@@ -107,7 +91,7 @@ const Index = () => {
             Voice-Enabled RAG Chatbot
           </h1>
           <p className="text-muted-foreground">
-            Upload documents, ask questions, and get intelligent responses powered by AI
+            Ask questions and get intelligent responses powered by AI
           </p>
         </div>
 
@@ -122,20 +106,9 @@ const Index = () => {
               
               <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                 <div className="text-sm text-blue-800">
-                  <strong>{documentCount}</strong> document chunks processed
+                  <strong>{documentCount}</strong> document chunks available
                 </div>
-                {isProcessing && (
-                  <div className="text-xs text-blue-600 mt-1">
-                    Processing files...
-                  </div>
-                )}
               </div>
-
-              <FileUpload
-                onFileUpload={handleFileUpload}
-                uploadedFiles={uploadedFiles}
-                onRemoveFile={handleRemoveFile}
-              />
             </Card>
           </div>
 
@@ -194,7 +167,7 @@ const Index = () => {
                 </div>
                 
                 <div className="text-xs text-muted-foreground mt-2 text-center">
-                  Press Enter to send • Upload documents to enhance responses
+                  Press Enter to send
                 </div>
               </div>
             </Card>
