@@ -34,7 +34,7 @@ export const useLangChainRAG = () => {
       
       // Create embeddings instance
       const embeddings = new OpenAIEmbeddings({
-        apiKey: openAIKey,
+        openAIApiKey: openAIKey,
         modelName: 'text-embedding-3-small'
       });
 
@@ -69,7 +69,7 @@ export const useLangChainRAG = () => {
     try {
       // Create LLM instance
       const llm = new OpenAI({
-        apiKey: apiKey,
+        openAIApiKey: apiKey,
         modelName: 'gpt-4o-mini',
         temperature: 0.7
       });
@@ -86,7 +86,7 @@ Answer:`,
         inputVariables: ['context', 'question']
       });
 
-      // Create retrieval QA chain
+      // Create retrieval QA chain with correct retriever method
       const chain = RetrievalQAChain.fromLLM(llm, vectorStore.asRetriever(), {
         prompt: promptTemplate,
         returnSourceDocuments: true
