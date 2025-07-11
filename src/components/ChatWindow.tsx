@@ -14,17 +14,16 @@ import { toast } from '@/hooks/use-toast';
 
 interface ChatWindowProps {
   mode: 'study' | 'quiz';
-  useLangChain?: boolean;
   onInitializeRAG?: (apiKey: string) => Promise<void>;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ mode, useLangChain = false, onInitializeRAG }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ mode, onInitializeRAG }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Use either LangChain RAG or simple RAG based on prop
+  // Use LangChain RAG as primary, fallback to simple RAG
   const { generateResponse: generateSimpleResponse } = useRAG();
   const { 
     generateResponse: generateLangChainResponse, 
@@ -38,9 +37,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode, useLangChain = false, onI
 
   useEffect(() => {
     // Mode-specific welcome message
-    const ragStatus = useLangChain 
-      ? (isLangChainInitialized ? ' (LangChain RAG active)' : ' (Initialize LangChain for enhanced features)')
-      : ' (Simple RAG active)';
+    const ragStatus = isLangChainInitialized 
+      ? ' (Advanced RAG active)' 
+      : ' (Initialize advanced RAG for enhanced features)';
       
     const welcomeMessage: Message = {
       id: 'welcome',
@@ -51,7 +50,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode, useLangChain = false, onI
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
-  }, [mode, useLangChain, isLangChainInitialized]);
+  }, [mode, isLangChainInitialized]);
 
   const handleSendMessage = async (content: string, audioBlob?: Blob) => {
     if (!content.trim() && !audioBlob) return;
@@ -71,8 +70,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode, useLangChain = false, onI
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Choose which RAG system to use
-      const response = useLangChain && isLangChainInitialized
+      // Use LangChain RAG if initialized, otherwise fall back to simple RAG
+      const response = isLangChainInitialized
         ? await generateLangChainResponse(content)
         : await generateSimpleResponse(content);
       
@@ -115,7 +114,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode, useLangChain = false, onI
           <MessageCircle className="h-5 w-5" />
           <h2 className="text-lg font-semibold">
             {mode === 'study' ? 'Study Chat' : 'Quiz Mode'}
-            {useLangChain && <span className="text-xs ml-2 opacity-75">(LangChain)</span>}
+            {isLangChainInitialized && <span className="text-xs ml-2 opacity-75">(Advanced RAG)</span>}
           </h2>
         </div>
       </div>

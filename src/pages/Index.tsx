@@ -1,21 +1,15 @@
 
-import React, { useState } from 'react';
-import { FileText, Zap } from 'lucide-react';
+import React from 'react';
+import { FileText } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import ChatWithModes from '@/components/ChatWithModes';
 import RAGInitializer from '@/components/RAGInitializer';
 import { useRAG } from '@/hooks/useRAG';
 import { useLangChainRAG } from '@/hooks/useLangChainRAG';
 
 const Index = () => {
-  const [useLangChain, setUseLangChain] = useState(false);
   const { documentCount } = useRAG();
   const { isInitialized, initializeRAG } = useLangChainRAG();
-
-  const handleRAGToggle = () => {
-    setUseLangChain(!useLangChain);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -44,38 +38,17 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* RAG System Toggle */}
-              <div className="mb-4">
-                <Button
-                  onClick={handleRAGToggle}
-                  variant={useLangChain ? "default" : "outline"}
-                  className="w-full flex items-center gap-2"
-                >
-                  <Zap className="h-4 w-4" />
-                  {useLangChain ? 'Using LangChain RAG' : 'Use LangChain RAG'}
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {useLangChain 
-                    ? 'Advanced embeddings and retrieval active'
-                    : 'Click to enable advanced RAG features'
-                  }
-                </p>
-              </div>
-
-              {/* RAG Initializer - only show when LangChain is selected */}
-              {useLangChain && (
-                <RAGInitializer
-                  onInitialize={initializeRAG}
-                  isInitialized={isInitialized}
-                />
-              )}
+              {/* RAG Initializer */}
+              <RAGInitializer
+                onInitialize={initializeRAG}
+                isInitialized={isInitialized}
+              />
             </Card>
           </div>
 
           {/* Chat Panel */}
           <div className="lg:col-span-2">
             <ChatWithModes 
-              useLangChain={useLangChain}
               onInitializeRAG={initializeRAG}
             />
           </div>

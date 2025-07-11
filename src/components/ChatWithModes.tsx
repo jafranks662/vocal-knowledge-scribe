@@ -4,11 +4,10 @@ import ChatWindow from './ChatWindow';
 import { Button } from '@/components/ui/button';
 
 interface ChatWithModesProps {
-  useLangChain?: boolean;
   onInitializeRAG?: (apiKey: string) => Promise<void>;
 }
 
-const ChatWithModes: React.FC<ChatWithModesProps> = ({ useLangChain = false, onInitializeRAG }) => {
+const ChatWithModes: React.FC<ChatWithModesProps> = ({ onInitializeRAG }) => {
   const [mode, setMode] = useState<'study' | 'quiz'>('study');
 
   const activeClasses = 'bg-blue-500 text-white';
@@ -32,10 +31,9 @@ const ChatWithModes: React.FC<ChatWithModesProps> = ({ useLangChain = false, onI
         </Button>
       </div>
 
-      {/* Pass the current mode and LangChain props to the chat window */}
+      {/* Pass the current mode to the chat window */}
       <ChatWindow 
         mode={mode} 
-        useLangChain={useLangChain}
         onInitializeRAG={onInitializeRAG}
       />
     </div>
