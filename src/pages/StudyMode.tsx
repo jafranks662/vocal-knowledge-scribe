@@ -9,8 +9,13 @@ import {
 } from '@/components/ui/card';
 import { studyNotes } from '@/data/studyNotes';
 
+type SpeechRecognitionConstructor = typeof window.SpeechRecognition;
+
 const SpeechRecognition =
-  (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  window.SpeechRecognition ||
+  (window as Window & {
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }).webkitSpeechRecognition;
 
 const StudyMode: React.FC = () => {
   const [step, setStep] = useState(0);
