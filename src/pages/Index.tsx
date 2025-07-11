@@ -1,12 +1,21 @@
 
-import React from 'react';
-import { FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { FileText, Zap } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import ChatWithModes from '@/components/ChatWithModes';
+import RAGInitializer from '@/components/RAGInitializer';
 import { useRAG } from '@/hooks/useRAG';
+import { useLangChainRAG } from '@/hooks/useLangChainRAG';
 
 const Index = () => {
+  const [useLangChain, setUseLangChain] = useState(false);
   const { documentCount } = useRAG();
+  const { isInitialized, initializeRAG } = useLangChainRAG();
+
+  const handleRAGToggle = () => {
+    setUseLangChain(!useLangChain);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -22,8 +31,8 @@ const Index = () => {
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Knowledge Base Panel */}
-          <div className="lg:col-span-1">
-            <Card className="p-6 h-fit">
+          <div className="lg:col-span-1 space-y-4">
+            <Card className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FileText className="h-5 w-5 text-blue-500" />
                 <h2 className="text-lg font-semibold">Knowledge Base</h2>
@@ -34,12 +43,41 @@ const Index = () => {
                   <strong>{documentCount}</strong> document chunks available
                 </div>
               </div>
+
+              {/* RAG System Toggle */}
+              <div className="mb-4">
+                <Button
+                  onClick={handleRAGToggle}
+                  variant={useLangChain ? "default" : "outline"}
+                  className="w-full flex items-center gap-2"
+                >
+                  <Zap className="h-4 w-4" />
+                  {useLangChain ? 'Using LangChain RAG' : 'Use LangChain RAG'}
+                </Button>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {useLangChain 
+                    ? 'Advanced embeddings and retrieval active'
+                    : 'Click to enable advanced RAG features'
+                  }
+                </p>
+              </div>
+
+              {/* RAG Initializer - only show when LangChain is selected */}
+              {useLangChain && (
+                <RAGInitializer
+                  onInitialize={initializeRAG}
+                  isInitialized={isInitialized}
+                />
+              )}
             </Card>
           </div>
 
-          {/* Chat Panel with Mode Toggle */}
+          {/* Chat Panel */}
           <div className="lg:col-span-2">
-            <ChatWithModes />
+            <ChatWithModes 
+              useLangChain={useLangChain}
+              onInitializeRAG={initializeRAG}
+            />
           </div>
         </div>
       </div>

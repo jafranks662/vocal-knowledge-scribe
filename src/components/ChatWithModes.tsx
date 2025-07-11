@@ -1,15 +1,16 @@
+
 import React, { useState } from 'react';
 import ChatWindow from './ChatWindow';
 import { Button } from '@/components/ui/button';
 
-/**
- * Wrapper component that renders mode selection buttons and the chat window.
- */
-const ChatWithModes: React.FC = () => {
-  // Track whether the user is in study or quiz mode. Defaults to "study".
+interface ChatWithModesProps {
+  useLangChain?: boolean;
+  onInitializeRAG?: (apiKey: string) => Promise<void>;
+}
+
+const ChatWithModes: React.FC<ChatWithModesProps> = ({ useLangChain = false, onInitializeRAG }) => {
   const [mode, setMode] = useState<'study' | 'quiz'>('study');
 
-  // Styles applied to the active mode button for visual indication.
   const activeClasses = 'bg-blue-500 text-white';
   const inactiveClasses = 'bg-muted';
 
@@ -31,8 +32,12 @@ const ChatWithModes: React.FC = () => {
         </Button>
       </div>
 
-      {/* Pass the current mode to the chat window */}
-      <ChatWindow mode={mode} />
+      {/* Pass the current mode and LangChain props to the chat window */}
+      <ChatWindow 
+        mode={mode} 
+        useLangChain={useLangChain}
+        onInitializeRAG={onInitializeRAG}
+      />
     </div>
   );
 };

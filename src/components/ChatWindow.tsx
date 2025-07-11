@@ -8,20 +8,29 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import ChatMessage, { Message } from '@/components/ChatMessage';
 import TypingIndicator from '@/components/TypingIndicator';
+import { useLangChainRAG } from '@/hooks/useLangChainRAG';
 import { useRAG } from '@/hooks/useRAG';
 import { toast } from '@/hooks/use-toast';
 
 interface ChatWindowProps {
   mode: 'study' | 'quiz';
+  useLangChain?: boolean;
+  onInitializeRAG?: (apiKey: string) => Promise<void>;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ mode, useLangChain = false, onInitializeRAG }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { generateResponse } = useRAG();
+  // Use either LangChain RAG or simple RAG based on prop
+  const { generateResponse: generateSimpleResponse } = useRAG();
+  const { 
+    generateResponse: generateLangChainResponse, 
+    initializeRAG,
+    isInitialized: isLangChainInitialized 
+  } = useLangChainRAG();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -29,16 +38,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
 
   useEffect(() => {
     // Mode-specific welcome message
+    const ragStatus = useLangChain 
+      ? (isLangChainInitialized ? ' (LangChain RAG active)' : ' (Initialize LangChain for enhanced features)')
+      : ' (Simple RAG active)';
+      
     const welcomeMessage: Message = {
       id: 'welcome',
       type: 'assistant',
       content: mode === 'study' 
-        ? 'I\'m here to help you study! Ask me questions about the course material.'
-        : 'Quiz mode activated! I\'ll ask you questions to test your knowledge.',
+        ? `I'm here to help you study! Ask me questions about the course material.${ragStatus}`
+        : `Quiz mode activated! I'll ask you questions to test your knowledge.${ragStatus}`,
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
-  }, [mode]);
+  }, [mode, useLangChain, isLangChainInitialized]);
 
   const handleSendMessage = async (content: string, audioBlob?: Blob) => {
     if (!content.trim() && !audioBlob) return;
@@ -58,7 +71,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const response = await generateResponse(content);
+      // Choose which RAG system to use
+      const response = useLangChain && isLangChainInitialized
+        ? await generateLangChainResponse(content)
+        : await generateSimpleResponse(content);
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -85,6 +101,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
     handleSendMessage(transcribedText, audioBlob);
   };
 
+  const handleInitialize = async (apiKey: string) => {
+    await initializeRAG(apiKey);
+    if (onInitializeRAG) {
+      await onInitializeRAG(apiKey);
+    }
+  };
+
   return (
     <Card className="h-[70vh] flex flex-col">
       <div className="p-4 border-b bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-t-lg">
@@ -92,6 +115,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
           <MessageCircle className="h-5 w-5" />
           <h2 className="text-lg font-semibold">
             {mode === 'study' ? 'Study Chat' : 'Quiz Mode'}
+            {useLangChain && <span className="text-xs ml-2 opacity-75">(LangChain)</span>}
           </h2>
         </div>
       </div>
