@@ -108,7 +108,7 @@ Answer:`,
 
       // Format the response with source information
       const sourceFiles = result.sourceDocuments
-        ?.map((doc: any) => doc.metadata.fileName)
+        ?.map((doc: Document) => doc.metadata.fileName)
         .filter((fileName: string, index: number, arr: string[]) => arr.indexOf(fileName) === index)
         .join(', ') || 'Unknown sources';
 

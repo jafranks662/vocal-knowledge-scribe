@@ -25,8 +25,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { get: getTTS, set: setTTS } = useTTSToggle();
 
-// Add-system-prompts-for-study-and-quiz-modes
-  const { generateResponse } = useRAG();
+// Mode-specific system prompts
   const systemPrompt = mode === 'study' ? STUDY_MODE_PROMPT : QUIZ_MODE_PROMPT;
   // Use LangChain RAG as primary, fallback to simple RAG
   const { generateResponse: generateSimpleResponse } = useRAG();
@@ -34,7 +33,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
     generateResponse: generateLangChainResponse,
     isInitialized: isLangChainInitialized
   } = useLangChainRAG();
-main
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -72,23 +70,20 @@ main
     setInputText('');
     setIsTyping(true);
 
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-// codex/add-system-prompts-for-study-and-quiz-modes
-      const response = await generateResponse(content, systemPrompt);
-      // Use LangChain RAG if initialized, otherwise fall back to simple RAG
-      const response = isLangChainInitialized
-        ? await generateLangChainResponse(content)
-        : await generateSimpleResponse(content);
-main
-      
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: response,
-        timestamp: new Date(),
-      };
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Use LangChain RAG if initialized, otherwise fall back to simple RAG
+        const response = isLangChainInitialized
+          ? await generateLangChainResponse(content)
+          : await generateSimpleResponse(content);
+
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: 'assistant',
+          content: response,
+          timestamp: new Date(),
+        };
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
