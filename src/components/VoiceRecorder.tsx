@@ -4,7 +4,7 @@ import { Mic, MicOff, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface VoiceRecorderProps {
-  onRecordingComplete: (audioBlob: Blob) => void;
+  onRecordingComplete: (audioBlob: Blob, transcript: string) => void;
   isDisabled?: boolean;
 }
 
@@ -13,6 +13,8 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete, isDi
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const transcriptRef = useRef('');
 
   useEffect(() => {
     // Check for microphone permission on component mount
@@ -25,9 +27,27 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete, isDi
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
-      
+
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
+
+      const SpeechRecognitionImpl =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognitionImpl) {
+        recognitionRef.current = new SpeechRecognitionImpl();
+        recognitionRef.current.lang = 'en-US';
+        recognitionRef.current.interimResults = true;
+        transcriptRef.current = '';
+        recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const res = event.results[i];
+            if (res.isFinal) {
+              transcriptRef.current += `${res[0].transcript} `;
+            }
+          }
+        };
+        recognitionRef.current.start();
+      }
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -36,9 +56,21 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete, isDi
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        onRecordingComplete(audioBlob);
-        stream.getTracks().forEach(track => track.stop());
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: 'audio/wav'
+        });
+
+        if (recognitionRef.current) {
+          recognitionRef.current.onend = () => {
+            const transcript = transcriptRef.current.trim();
+            onRecordingComplete(audioBlob, transcript);
+            stream.getTracks().forEach((track) => track.stop());
+          };
+          recognitionRef.current.stop();
+        } else {
+          onRecordingComplete(audioBlob, '');
+          stream.getTracks().forEach((track) => track.stop());
+        }
       };
 
       mediaRecorder.start();
