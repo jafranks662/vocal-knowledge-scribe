@@ -98,9 +98,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
     }
   };
 
-  const handleVoiceRecording = (audioBlob: Blob) => {
-    const transcribedText = "This is a simulated transcription of your voice message.";
-    handleSendMessage(transcribedText, audioBlob);
+  const handleVoiceRecording = (audioBlob: Blob, transcript: string) => {
+    const text = transcript || '[Voice message]';
+    handleSendMessage(text, audioBlob);
   };
 
 
