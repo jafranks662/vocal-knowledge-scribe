@@ -1,73 +1,43 @@
-# Welcome to your Lovable project
+# Vocal Knowledge Scribe
 
-## Project info
+A voice-enabled chatbot demonstrating Retrieval Augmented Generation (RAG). The assistant answers questions using a small set of administrator-provided documents. Voice messages are supported through the browser microphone API.
 
-**URL**: https://lovable.dev/projects/bf9504db-85e2-4559-952c-97eaa6f4ae59
+## Getting Started
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/bf9504db-85e2-4559-952c-97eaa6f4ae59) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+1. Clone this repository and install dependencies.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+cd vocal-knowledge-scribe
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+This starts the Vite development server on <http://localhost:8080> with hot reloading.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Adding Documents to the Database
 
-**Use GitHub Codespaces**
+Documents are stored in Supabase and mirrored locally for convenience. To include additional documents:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1. Add your content to Supabase using the dashboard or API.
+2. Update `src/data/adminDocuments.ts` with new `DocumentChunk` entries so the demo recognizes them.
+3. Restart the development server to load the new data.
 
-## What technologies are used for this project?
+Each `DocumentChunk` has an `id`, `content` string, and `metadata` describing the source file and chunk index.
 
-This project is built with:
+## Tools Used
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Vite** – build and development server
+- **TypeScript** – static typing
+- **React** – UI framework
+- **shadcn-ui** – component library
+- **Tailwind CSS** – styling
+- **Supabase** – database backend
+- **React Query** – remote data management
+- **pdf-parse** – PDF text extraction
+- **lucide-react** – icon set
+- **zod** – schema validation
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/bf9504db-85e2-4559-952c-97eaa6f4ae59) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Run `npm run build` to create a production build in the `dist` folder and serve those files with any static host.
