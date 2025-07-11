@@ -14,10 +14,9 @@ import { toast } from '@/hooks/use-toast';
 
 interface ChatWindowProps {
   mode: 'study' | 'quiz';
-  onInitializeRAG?: (apiKey: string) => Promise<void>;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({ mode, onInitializeRAG }) => {
+const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -25,10 +24,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode, onInitializeRAG }) => {
 
   // Use LangChain RAG as primary, fallback to simple RAG
   const { generateResponse: generateSimpleResponse } = useRAG();
-  const { 
-    generateResponse: generateLangChainResponse, 
-    initializeRAG,
-    isInitialized: isLangChainInitialized 
+  const {
+    generateResponse: generateLangChainResponse,
+    isInitialized: isLangChainInitialized
   } = useLangChainRAG();
 
   useEffect(() => {
@@ -100,12 +98,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode, onInitializeRAG }) => {
     handleSendMessage(transcribedText, audioBlob);
   };
 
-  const handleInitialize = async (apiKey: string) => {
-    await initializeRAG(apiKey);
-    if (onInitializeRAG) {
-      await onInitializeRAG(apiKey);
-    }
-  };
 
   return (
     <Card className="h-[70vh] flex flex-col">
