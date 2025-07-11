@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,14 +9,6 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { studyNotes } from '@/data/studyNotes';
-
-type SpeechRecognitionConstructor = typeof window.SpeechRecognition;
-
-const SpeechRecognition =
-  window.SpeechRecognition ||
-  (window as Window & {
-    webkitSpeechRecognition?: SpeechRecognitionConstructor;
-  }).webkitSpeechRecognition;
 
 const StudyMode: React.FC = () => {
   const [step, setStep] = useState(0);
@@ -33,8 +26,10 @@ const StudyMode: React.FC = () => {
   }, [step, note]);
 
   useEffect(() => {
-    if (!SpeechRecognition) return;
-    const recognition = new SpeechRecognition();
+    const SpeechRecognitionImpl = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognitionImpl) return;
+    
+    const recognition = new SpeechRecognitionImpl();
     recognition.continuous = true;
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       const text = event.results[event.results.length - 1][0].transcript.toLowerCase();

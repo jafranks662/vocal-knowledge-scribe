@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -31,9 +32,7 @@ const VoiceQuiz: React.FC = () => {
   };
 
   const startListening = () => {
-    // `SpeechRecognition` and `webkitSpeechRecognition` are vendor prefixes
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const SpeechRecognitionImpl = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognitionImpl = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionImpl) {
       console.error('SpeechRecognition is not supported in this browser');
       return;
@@ -89,7 +88,6 @@ const VoiceQuiz: React.FC = () => {
 
   useEffect(() => {
     speak(sampleQuestions[currentIndex].prompt);
-    // Stop any ongoing recognition when question changes
     stopListening();
   }, [currentIndex]);
 
@@ -129,4 +127,3 @@ const VoiceQuiz: React.FC = () => {
 };
 
 export default VoiceQuiz;
-
