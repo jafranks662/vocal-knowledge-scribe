@@ -75,7 +75,6 @@ const Index = () => {
     }
   };
 
-
   const handleVoiceRecording = (audioBlob: Blob) => {
     // In a real implementation, you'd convert speech to text here
     // For now, we'll simulate with a placeholder
@@ -88,10 +87,10 @@ const Index = () => {
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Voice-Enabled RAG Chatbot
+            StudyBot
           </h1>
           <p className="text-muted-foreground">
-            Ask questions and get intelligent responses powered by AI
+            Type or Ask Below
           </p>
         </div>
 
