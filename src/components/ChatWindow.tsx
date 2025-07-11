@@ -10,6 +10,7 @@ import ChatMessage, { Message } from '@/components/ChatMessage';
 import TypingIndicator from '@/components/TypingIndicator';
 import { useRAG } from '@/hooks/useRAG';
 import { toast } from '@/hooks/use-toast';
+import { STUDY_MODE_PROMPT, QUIZ_MODE_PROMPT } from '@/data/systemPrompts';
 
 interface ChatWindowProps {
   mode: 'study' | 'quiz';
@@ -22,6 +23,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { generateResponse } = useRAG();
+  const systemPrompt = mode === 'study' ? STUDY_MODE_PROMPT : QUIZ_MODE_PROMPT;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -58,7 +60,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const response = await generateResponse(content);
+      const response = await generateResponse(content, systemPrompt);
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),

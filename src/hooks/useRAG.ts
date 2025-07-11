@@ -35,8 +35,9 @@ export const useRAG = () => {
       .map(item => item.chunk);
   }, [documents]);
 
-  const generateResponse = useCallback(async (query: string): Promise<string> => {
-    const relevantChunks = searchRelevantChunks(query);
+  const generateResponse = useCallback(
+    async (query: string, systemPrompt?: string): Promise<string> => {
+      const relevantChunks = searchRelevantChunks(query);
     
     if (relevantChunks.length === 0) {
       return "I don't have any relevant information in my knowledge base to answer your question.";
@@ -44,6 +45,11 @@ export const useRAG = () => {
 
     // Simulate AI response generation
     const context = relevantChunks.map(chunk => chunk.content).join('\n\n');
+
+    // The system prompt guides the tone or behavior of the assistant.
+    // It would be sent to the language model along with the user query
+    // but it should remain hidden from the user.
+    const hiddenSystemPrompt = systemPrompt || '';
     
     // This is a simple mock response - in a real implementation, 
     // you'd use an actual LLM API like OpenAI, Anthropic, or local models
