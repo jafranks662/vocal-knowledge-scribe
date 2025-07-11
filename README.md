@@ -15,6 +15,15 @@ npm run dev
 
 This starts the Vite development server on <http://localhost:8080> with hot reloading.
 
+### Configuration
+
+Set your OpenAI credentials in a `.env` file at the project root. Copy `.env.example` and populate `VITE_OPENAI_API_KEY` with your key:
+
+```sh
+cp .env.example .env
+echo "VITE_OPENAI_API_KEY=sk-your-key" >> .env
+```
+
 ## Adding Documents to the Database
 
 Documents are stored in Supabase and mirrored locally for convenience. To include additional documents:

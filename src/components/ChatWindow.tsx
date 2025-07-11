@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import ChatMessage, { Message } from '@/components/ChatMessage';
 import TypingIndicator from '@/components/TypingIndicator';
+import { useLangChainRAG } from '@/hooks/useLangChainRAG';
 import { useRAG } from '@/hooks/useRAG';
 import { toast } from '@/hooks/use-toast';
 import { STUDY_MODE_PROMPT, QUIZ_MODE_PROMPT } from '@/data/systemPrompts';
@@ -22,8 +23,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+// Add-system-prompts-for-study-and-quiz-modes
   const { generateResponse } = useRAG();
   const systemPrompt = mode === 'study' ? STUDY_MODE_PROMPT : QUIZ_MODE_PROMPT;
+  // Use LangChain RAG as primary, fallback to simple RAG
+  const { generateResponse: generateSimpleResponse } = useRAG();
+  const {
+    generateResponse: generateLangChainResponse,
+    isInitialized: isLangChainInitialized
+  } = useLangChainRAG();
+main
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -31,16 +40,20 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
 
   useEffect(() => {
     // Mode-specific welcome message
+    const ragStatus = isLangChainInitialized 
+      ? ' (Advanced RAG active)' 
+      : ' (Initialize advanced RAG for enhanced features)';
+      
     const welcomeMessage: Message = {
       id: 'welcome',
       type: 'assistant',
       content: mode === 'study' 
-        ? 'I\'m here to help you study! Ask me questions about the course material.'
-        : 'Quiz mode activated! I\'ll ask you questions to test your knowledge.',
+        ? `I'm here to help you study! Ask me questions about the course material.${ragStatus}`
+        : `Quiz mode activated! I'll ask you questions to test your knowledge.${ragStatus}`,
       timestamp: new Date(),
     };
     setMessages([welcomeMessage]);
-  }, [mode]);
+  }, [mode, isLangChainInitialized]);
 
   const handleSendMessage = async (content: string, audioBlob?: Blob) => {
     if (!content.trim() && !audioBlob) return;
@@ -60,7 +73,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+// codex/add-system-prompts-for-study-and-quiz-modes
       const response = await generateResponse(content, systemPrompt);
+      // Use LangChain RAG if initialized, otherwise fall back to simple RAG
+      const response = isLangChainInitialized
+        ? await generateLangChainResponse(content)
+        : await generateSimpleResponse(content);
+main
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -87,6 +106,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
     handleSendMessage(transcribedText, audioBlob);
   };
 
+
   return (
     <Card className="h-[70vh] flex flex-col">
       <div className="p-4 border-b bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-t-lg">
@@ -94,6 +114,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
           <MessageCircle className="h-5 w-5" />
           <h2 className="text-lg font-semibold">
             {mode === 'study' ? 'Study Chat' : 'Quiz Mode'}
+            {isLangChainInitialized && <span className="text-xs ml-2 opacity-75">(Advanced RAG)</span>}
           </h2>
         </div>
       </div>
