@@ -19,9 +19,10 @@ This starts the Vite development server on <http://localhost:8080> with hot relo
 
 Documents are stored in Supabase and mirrored locally for convenience. To include additional documents:
 
-1. Add your content to Supabase using the dashboard or API.
-2. Update `src/data/adminDocuments.ts` with new `DocumentChunk` entries so the demo recognizes them.
-3. Restart the development server to load the new data.
+1. Set up the database by running the SQL statements in `supabase/schema.sql` on your Supabase project.
+2. Add your content to Supabase using the dashboard or API.
+3. Update `src/data/adminDocuments.ts` with new `DocumentChunk` entries so the demo recognizes them.
+4. Restart the development server to load the new data.
 
 Each `DocumentChunk` has an `id`, `content` string, and `metadata` describing the source file and chunk index.
 
