@@ -11,6 +11,7 @@ import TypingIndicator from '@/components/TypingIndicator';
 import { useLangChainRAG } from '@/hooks/useLangChainRAG';
 import { useRAG } from '@/hooks/useRAG';
 import { toast } from '@/hooks/use-toast';
+import { STUDY_MODE_PROMPT, QUIZ_MODE_PROMPT } from '@/data/systemPrompts';
 
 interface ChatWindowProps {
   mode: 'study' | 'quiz';
@@ -22,12 +23,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+// Add-system-prompts-for-study-and-quiz-modes
+  const { generateResponse } = useRAG();
+  const systemPrompt = mode === 'study' ? STUDY_MODE_PROMPT : QUIZ_MODE_PROMPT;
   // Use LangChain RAG as primary, fallback to simple RAG
   const { generateResponse: generateSimpleResponse } = useRAG();
   const {
     generateResponse: generateLangChainResponse,
     isInitialized: isLangChainInitialized
   } = useLangChainRAG();
+main
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -68,10 +73,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+// codex/add-system-prompts-for-study-and-quiz-modes
+      const response = await generateResponse(content, systemPrompt);
       // Use LangChain RAG if initialized, otherwise fall back to simple RAG
       const response = isLangChainInitialized
         ? await generateLangChainResponse(content)
         : await generateSimpleResponse(content);
+main
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
