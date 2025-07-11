@@ -23,10 +23,14 @@ export const useLangChainRAG = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [apiKey, setApiKey] = useState<string>('');
 
+  const envApiKey = import.meta.env.VITE_OPENAI_API_KEY as string | undefined;
+
   // Initialize vector store and embeddings
-  const initializeRAG = useCallback(async (openAIKey: string) => {
-    if (!openAIKey.trim()) {
-      throw new Error('OpenAI API key is required');
+  const initializeRAG = useCallback(async () => {
+    const openAIKey = envApiKey;
+    if (!openAIKey || !openAIKey.trim()) {
+      console.warn('OpenAI API key not configured');
+      return;
     }
 
     try {
@@ -59,7 +63,14 @@ export const useLangChainRAG = () => {
       console.error('Failed to initialize LangChain RAG:', error);
       throw new Error('Failed to initialize RAG system');
     }
-  }, [documents]);
+  }, [documents, envApiKey]);
+
+  // Automatically initialize when the hook loads and a key is present
+  useEffect(() => {
+    if (!isInitialized) {
+      initializeRAG();
+    }
+  }, [initializeRAG, isInitialized]);
 
   const generateResponse = useCallback(async (query: string): Promise<string> => {
     if (!isInitialized || !vectorStore || !apiKey) {

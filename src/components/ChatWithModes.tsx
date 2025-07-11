@@ -3,11 +3,9 @@ import React, { useState } from 'react';
 import ChatWindow from './ChatWindow';
 import { Button } from '@/components/ui/button';
 
-interface ChatWithModesProps {
-  onInitializeRAG?: (apiKey: string) => Promise<void>;
-}
+interface ChatWithModesProps {}
 
-const ChatWithModes: React.FC<ChatWithModesProps> = ({ onInitializeRAG }) => {
+const ChatWithModes: React.FC<ChatWithModesProps> = () => {
   const [mode, setMode] = useState<'study' | 'quiz'>('study');
 
   const activeClasses = 'bg-blue-500 text-white';
@@ -32,9 +30,8 @@ const ChatWithModes: React.FC<ChatWithModesProps> = ({ onInitializeRAG }) => {
       </div>
 
       {/* Pass the current mode to the chat window */}
-      <ChatWindow 
-        mode={mode} 
-        onInitializeRAG={onInitializeRAG}
+      <ChatWindow
+        mode={mode}
       />
     </div>
   );

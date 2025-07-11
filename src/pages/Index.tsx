@@ -3,13 +3,12 @@ import React from 'react';
 import { FileText } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import ChatWithModes from '@/components/ChatWithModes';
-import RAGInitializer from '@/components/RAGInitializer';
 import { useRAG } from '@/hooks/useRAG';
 import { useLangChainRAG } from '@/hooks/useLangChainRAG';
 
 const Index = () => {
   const { documentCount } = useRAG();
-  const { isInitialized, initializeRAG } = useLangChainRAG();
+  const { isInitialized } = useLangChainRAG();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -38,19 +37,18 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* RAG Initializer */}
-              <RAGInitializer
-                onInitialize={initializeRAG}
-                isInitialized={isInitialized}
-              />
+              {/* Advanced RAG status */}
+              {isInitialized && (
+                <div className="p-4 bg-green-50 border-green-200 rounded">
+                  <span className="text-green-700 font-medium">LangChain RAG Active</span>
+                </div>
+              )}
             </Card>
           </div>
 
           {/* Chat Panel */}
           <div className="lg:col-span-2">
-            <ChatWithModes 
-              onInitializeRAG={initializeRAG}
-            />
+            <ChatWithModes />
           </div>
         </div>
       </div>
