@@ -9,6 +9,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { studyNotes } from '@/data/studyNotes';
+import { speak } from '@/lib/voice';
 
 const StudyMode: React.FC = () => {
   const [step, setStep] = useState(0);
@@ -21,8 +22,7 @@ const StudyMode: React.FC = () => {
     setAiResponse(null);
     setUnderstood(false);
     if (!note) return;
-    const utterance = new SpeechSynthesisUtterance(note.content);
-    speechSynthesis.speak(utterance);
+    speak(note.content);
   }, [step, note]);
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const StudyMode: React.FC = () => {
     const prompt = `Rephrase or simplify the following explanation:\n\n${note.content}`;
     const result = await callOpenAI(prompt);
     setAiResponse(result);
-    speechSynthesis.speak(new SpeechSynthesisUtterance(result));
+    speak(result);
   };
 
   const handleAnalogy = async () => {
@@ -72,7 +72,7 @@ const StudyMode: React.FC = () => {
     const prompt = `Provide an analogy to help a student understand: ${note.content}`;
     const result = await callOpenAI(prompt);
     setAiResponse(result);
-    speechSynthesis.speak(new SpeechSynthesisUtterance(result));
+    speak(result);
   };
 
   const handleNext = () => {
