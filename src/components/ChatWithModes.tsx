@@ -3,9 +3,7 @@ import React, { useState } from 'react';
 import ChatWindow from './ChatWindow';
 import { Button } from '@/components/ui/button';
 
-interface ChatWithModesProps {}
-
-const ChatWithModes: React.FC<ChatWithModesProps> = () => {
+const ChatWithModes: React.FC = () => {
   const [mode, setMode] = useState<'study' | 'quiz'>('study');
 
   const activeClasses = 'bg-blue-500 text-white';
