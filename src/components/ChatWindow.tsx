@@ -11,6 +11,7 @@ import TypingIndicator from '@/components/TypingIndicator';
 import { useLangChainRAG } from '@/hooks/useLangChainRAG';
 import { useRAG } from '@/hooks/useRAG';
 import { toast } from '@/hooks/use-toast';
+import { useTTSToggle } from '@/hooks/useTTS';
 import { STUDY_MODE_PROMPT, QUIZ_MODE_PROMPT } from '@/data/systemPrompts';
 
 interface ChatWindowProps {
@@ -22,6 +23,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ mode }) => {
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { get: getTTS, set: setTTS } = useTTSToggle();
 
 // Add-system-prompts-for-study-and-quiz-modes
   const { generateResponse } = useRAG();
@@ -162,6 +164,14 @@ main
         
         <div className="text-xs text-muted-foreground mt-2 text-center">
           Press Enter to send
+          <label className="flex items-center gap-2 justify-center mt-2">
+            <input
+              type="checkbox"
+              defaultChecked={getTTS()}
+              onChange={e => setTTS(e.target.checked)}
+            />
+            🔈 Read answers aloud
+          </label>
         </div>
       </div>
     </Card>

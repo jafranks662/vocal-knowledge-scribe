@@ -3,6 +3,7 @@ import React from 'react';
 import { User, Bot } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import AudioPlayer from './AudioPlayer';
+import { useTTS } from '@/hooks/useTTS';
 
 export interface Message {
   id: string;
@@ -18,6 +19,7 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.type === 'user';
+  useTTS(message.content, message.type);
 
   return (
     <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} mb-4`}>

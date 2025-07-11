@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { speak } from '@/lib/voice';
 
 interface Question {
   prompt: string;
@@ -25,11 +26,6 @@ const VoiceQuiz: React.FC = () => {
   const [feedback, setFeedback] = useState('');
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-  const speak = (text: string) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  };
 
   const startListening = () => {
     const SpeechRecognitionImpl = window.SpeechRecognition || window.webkitSpeechRecognition;
